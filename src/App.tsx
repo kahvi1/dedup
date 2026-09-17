@@ -1,32 +1,47 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-// Canvas text measurement ported from renderer.js
-function getTextWidth(text, font) {
-    if (!getTextWidth._canvas) {
-        getTextWidth._canvas = document.createElement('canvas');
+interface FileEntry {
+    name: string;
+    path: string;
+    size: number;
+    addedAt: number;
+}
+
+// Expose the preload script's custom API to the global Window object
+declare global {
+    interface Window {
+        electronAPI: {
+            getPathForFile: (file: File) => string;
+        };
     }
-    const ctx = getTextWidth._canvas.getContext('2d');
+}
+
+let cachedCanvas: HTMLCanvasElement | null = null;
+function getTextWidth(text: string, font: string): number {
+    if (!cachedCanvas) cachedCanvas = document.createElement('canvas');
+    const ctx = cachedCanvas.getContext('2d');
+    if (!ctx) return 0;
     ctx.font = font;
     return ctx.measureText(text).width;
 }
 
-function formatBytes(bytes) {
+function formatBytes(bytes: number): string {
     if (bytes === 0) return '0 B';
     const units = ['B', 'KB', 'MB', 'GB', 'TB'];
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
     return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${units[i]}`;
 }
 
-// A dedicated component ensures each list item handles its own truncation[cite: 7]
-function FileItem({ entry }) {
-    const nameRef = useRef(null);
+function FileItem({ entry }: { entry: FileEntry }) {
+    const nameRef = useRef<HTMLSpanElement>(null);
     const [displayName, setDisplayName] = useState(entry.name);
 
     useEffect(() => {
         const nameSpan = nameRef.current;
         if (!nameSpan) return;
 
-        const availableWidth = nameSpan.clientWidth || nameSpan.parentElement.clientWidth - 20;
+        // Use the non-null assertion operator (!) since parentElement is guaranteed here
+        const availableWidth = nameSpan.clientWidth || nameSpan.parentElement!.clientWidth - 20;
         const font = getComputedStyle(nameSpan).font;
 
         if (getTextWidth(entry.name, font) <= availableWidth) {
@@ -39,7 +54,7 @@ function FileItem({ entry }) {
             truncated = truncated.slice(0, -1);
         }
         setDisplayName(truncated + '...');
-    }, [entry.name]); // Re-run if the file name changes
+    }, [entry.name]);
 
     return (
         <li className="file-item" title={entry.name}>
@@ -50,42 +65,38 @@ function FileItem({ entry }) {
 }
 
 export default function App() {
-    // State management replaces the global 'let files = []' array[cite: 7]
-    const [files, setFiles] = useState([]);
+    const [files, setFiles] = useState<FileEntry[]>([]);
     const [isDragOver, setIsDragOver] = useState(false);
 
-    const handleDragOver = (e) => {
+    const handleDragOver = (e: React.DragEvent<HTMLElement>) => {
         e.preventDefault();
         e.stopPropagation();
         setIsDragOver(true);
     };
 
-    const handleDragLeave = (e) => {
+    const handleDragLeave = (e: React.DragEvent<HTMLElement>) => {
         e.preventDefault();
         e.stopPropagation();
         setIsDragOver(false);
     };
 
-    const handleDrop = (e) => {
+    const handleDrop = (e: React.DragEvent<HTMLElement>) => {
         e.preventDefault();
         e.stopPropagation();
         setIsDragOver(false);
 
         const dropped = Array.from(e.dataTransfer.files);
 
-        const newEntries = dropped.map((file) => ({
+        const newEntries: FileEntry[] = dropped.map((file) => ({
             name: file.name,
-            // Accessing the API exposed by preload.js[cite: 6, 7]
             path: window.electronAPI.getPathForFile(file),
             size: file.size,
             addedAt: Date.now(),
         }));
 
-        // Immutably append new files to the existing state
         setFiles((prev) => [...prev, ...newEntries]);
     };
 
-    // Requirement: sort newest to oldest[cite: 7]
     const sortedFiles = [...files].sort((a, b) => b.addedAt - a.addedAt);
 
     return (

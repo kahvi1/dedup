@@ -2,16 +2,20 @@
   "name": "dedup",
   "version": "0.1.0",
   "description": "dedup - drag and drop data deduplication desktop app",
-  "main": "main.js",
+  "main": "dist-electron/main.js",
   "scripts": {
     "start": "npm run build && electron .",
-    "dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
-    "build": "vite build"
+    "dev": "tsc -p tsconfig.electron.json && concurrently \"vite\" \"wait-on http://localhost:5173 && electron . --dev\"",
+    "build": "tsc -p tsconfig.electron.json && vite build"
   },
   "devDependencies": {
+    "@types/node": "^24.13.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.1",
     "concurrently": "^10.0.5",
     "electron": "^44.0.0",
+    "typescript": "^7.0.2",
     "vite": "^8.3.0",
     "wait-on": "^9.1.0"
   },
