@@ -1,16 +1,12 @@
 {
-  "name": "dedup",
-  "version": "1.0.0",
-  "description": "Entity resolution system for data deduplication",
-  "license": "ISC",
-  "author": "",
-  "type": "module",
+  "name": "sidik-app",
+  "version": "0.1.0",
+  "description": "Sidik - drag and drop data deduplication desktop app",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "electron ."
   },
   "devDependencies": {
-    "electron": "^44.4.1"
+    "electron": "^44.0.0"
   }
 }
