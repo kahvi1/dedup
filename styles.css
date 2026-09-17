@@ -1,0 +1,94 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: #1e1e1e;
+  color: #e6e6e6;
+}
+
+.app {
+  display: flex;
+  height: 100vh;
+}
+
+/* Requirement: sidebar max width 600px */
+.sidebar {
+  width: 320px;
+  max-width: 600px;
+  min-width: 200px;
+  resize: horizontal;
+  overflow: hidden;
+  border-right: 1px solid #3a3a3a;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-title {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9a9a9a;
+  margin: 0 0 12px 0;
+}
+
+.file-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.file-item {
+  padding: 8px 10px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  background: #2a2a2a;
+  font-size: 13px;
+  white-space: nowrap;
+  cursor: default;
+}
+
+.file-item:hover {
+  background: #333;
+}
+
+/* block, not inline -- so its clientWidth reflects the actual available
+   width (constrained by the sidebar), which renderer.js needs to measure
+   correctly for truncation. An inline span would just shrink-to-fit its
+   own text instead. */
+.file-name {
+  display: block;
+}
+
+.file-item .file-size {
+  display: block;
+  font-size: 11px;
+  color: #8a8a8a;
+  margin-top: 2px;
+}
+
+.dropzone {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #9a9a9a;
+  border: 2px dashed transparent;
+  margin: 12px;
+  border-radius: 12px;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.dropzone.drag-over {
+  background: #26313d;
+  border-color: #56a2e8;
+}
+
+.dropzone-hint {
+  font-size: 12px;
+  color: #6a6a6a;
+}
