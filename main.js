@@ -13,7 +13,13 @@ function createWindow() {
     },
   });
 
-  win.loadFile('index.html');
+  const isDev = process.argv.includes('--dev');  
+
+  if  (isDev) {
+    win.loadURL('http://localhost:5173');
+  } else {
+    win.loadFile(path.join(__dirname, 'dist', 'index.html'));
+  }
 }
 
 app.whenReady().then(() => {

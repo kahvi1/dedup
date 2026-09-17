@@ -4,23 +4,11 @@
 <head>
   <meta charset="UTF-8" />
   <title>Dedup</title>
-  <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
-  <div class="app">
-    <aside id="sidebar" class="sidebar">
-      <h2 class="sidebar-title">Files</h2>
-      <ul id="file-list" class="file-list"></ul>
-    </aside>
-
-    <main id="dropzone" class="dropzone">
-      <p>Drag and drop any file here</p>
-      <p class="dropzone-hint">Any format, any size</p>
-    </main>
-  </div>
-
-  <script src="renderer.js"></script>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
 </body>
 
 </html>

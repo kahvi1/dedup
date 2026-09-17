@@ -4,9 +4,19 @@
   "description": "dedup - drag and drop data deduplication desktop app",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "npm run build && electron .",
+    "dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
+    "build": "vite build"
   },
   "devDependencies": {
-    "electron": "^44.0.0"
+    "@vitejs/plugin-react": "^6.1.1",
+    "concurrently": "^10.0.5",
+    "electron": "^44.0.0",
+    "vite": "^8.3.0",
+    "wait-on": "^9.1.0"
+  },
+  "dependencies": {
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
   }
 }
