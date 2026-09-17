@@ -1,5 +1,7 @@
-const { app, BrowserWindow } = require('electron');
-const path = require('node:path');
+import { app, BrowserWindow } from 'electron';
+import * as path from 'node:path';
+
+const isDev = process.argv.includes('--dev');
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -13,7 +15,12 @@ function createWindow() {
     },
   });
 
-  win.loadFile('index.html');
+
+  if  (isDev) {
+    win.loadURL('http://localhost:5173');
+  } else {
+    win.loadFile(path.join(__dirname, '..', 'dist', 'index.html'));
+  }
 }
 
 app.whenReady().then(() => {
