@@ -14,9 +14,9 @@ body {
 
 /* Requirement: sidebar max width 600px */
 .sidebar {
-  width: 320px;
+  width: 340px;
   max-width: 600px;
-  min-width: 200px;
+  min-width: 240px;
   resize: horizontal;
   overflow: hidden;
   border-right: 1px solid #3a3a3a;
@@ -25,12 +25,72 @@ body {
   flex-direction: column;
 }
 
-.sidebar-title {
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #9a9a9a;
-  margin: 0 0 12px 0;
+.sidebar-tabs {
+  display: flex;
+  gap: 6px;
+  border-bottom: 1px solid #333;
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+}
+
+.sidebar-tab {
+  background: transparent;
+  border: none;
+  color: #8a8a8a;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.sidebar-tab:hover {
+  background: #2a2a2a;
+  color: #d1d1d1;
+}
+
+.sidebar-tab.active {
+  background: #333333;
+  color: #ffffff;
+}
+
+.tab-badge {
+  background: #444;
+  color: #bbb;
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 10px;
+}
+
+.sidebar-tab.active .tab-badge {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.files-view {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.sidebar-empty {
+  color: #777;
+  font-size: 13px;
+  text-align: center;
+  margin-top: 40px;
+  line-height: 1.5;
+}
+
+.sidebar-empty span {
+  display: block;
+  font-size: 11px;
+  color: #555;
+  margin-top: 4px;
 }
 
 .file-list {
@@ -56,7 +116,7 @@ body {
 }
 
 /* block, not inline -- so its clientWidth reflects the actual available
-   width (constrained by the sidebar), which renderer.js needs to measure
+   width (constrained by the sidebar), which renderer needs to measure
    correctly for truncation. An inline span would just shrink-to-fit its
    own text instead. */
 .file-name {
@@ -70,6 +130,204 @@ body {
   margin-top: 2px;
 }
 
+/* Activity Log Styles */
+.activity-log-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  height: 100%;
+}
+
+.activity-log-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.activity-log-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.filter-btn {
+  font-size: 11px;
+  padding: 3px 7px;
+  border-radius: 4px;
+  border: 1px solid #383838;
+  background: #242424;
+  color: #999;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s;
+}
+
+.filter-btn:hover {
+  background: #2e2e2e;
+  color: #e0e0e0;
+}
+
+.filter-btn.active {
+  border-color: #3b82f6;
+  background: #1e3a8a;
+  color: #ffffff;
+}
+
+.filter-badge {
+  font-size: 10px;
+  opacity: 0.8;
+}
+
+.activity-log-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.action-btn {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid #3e3e3e;
+  background: #262626;
+  color: #aaa;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.action-btn:hover:not(:disabled) {
+  background: #333333;
+  color: #ffffff;
+}
+
+.action-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.action-btn.danger:hover:not(:disabled) {
+  background: #631c1c;
+  border-color: #8a2424;
+  color: #fca5a5;
+}
+
+.activity-log-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 2px;
+}
+
+.activity-log-item {
+  background: #252525;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 12px;
+  border-left: 3px solid #555;
+}
+
+.activity-log-item.level-info {
+  border-left-color: #3b82f6;
+}
+
+.activity-log-item.level-success {
+  border-left-color: #10b981;
+}
+
+.activity-log-item.level-warning {
+  border-left-color: #f59e0b;
+}
+
+.activity-log-item.level-error {
+  border-left-color: #ef4444;
+}
+
+.log-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.log-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+.badge-info {
+  background: #1e3a5f;
+  color: #93c5fd;
+}
+
+.badge-success {
+  background: #134e3a;
+  color: #a7f3d0;
+}
+
+.badge-warning {
+  background: #452c0a;
+  color: #fde68a;
+}
+
+.badge-error {
+  background: #4c1d1d;
+  color: #fca5a5;
+}
+
+.log-time {
+  font-size: 11px;
+  color: #777;
+  font-variant-numeric: tabular-nums;
+}
+
+.log-title {
+  font-weight: 600;
+  color: #eee;
+  margin-bottom: 2px;
+  word-break: break-word;
+}
+
+.log-message {
+  color: #aaa;
+  font-size: 11.5px;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+.log-details {
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.log-detail-tag {
+  background: #1c1c1c;
+  border: 1px solid #333;
+  color: #888;
+  font-size: 10px;
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+
+.activity-log-empty {
+  text-align: center;
+  color: #666;
+  font-size: 12px;
+  margin-top: 30px;
+}
+
+/* Dropzone */
 .dropzone {
   flex: 1;
   display: flex;
