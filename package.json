@@ -1,7 +1,7 @@
 {
-  "name": "sidik-app",
+  "name": "dedup",
   "version": "0.1.0",
-  "description": "Sidik - drag and drop data deduplication desktop app",
+  "description": "dedup - drag and drop data deduplication desktop app",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
