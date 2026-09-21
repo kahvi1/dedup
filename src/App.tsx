@@ -1,11 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-
-interface FileEntry {
-    name: string;
-    path: string;
-    size: number;
-    addedAt: number;
-}
+import { ActivityLogProvider, useActivityLog } from './context/ActivityLogContext';
+import { ActivityLog } from './components/ActivityLog';
+import { FileEntry } from './types';
 
 // Expose the preload script's custom API to the global Window object
 declare global {
@@ -25,7 +21,7 @@ function getTextWidth(text: string, font: string): number {
     return ctx.measureText(text).width;
 }
 
-function formatBytes(bytes: number): string {
+export function formatBytes(bytes: number): string {
     if (bytes === 0) return '0 B';
     const units = ['B', 'KB', 'MB', 'GB', 'TB'];
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
@@ -64,9 +60,11 @@ function FileItem({ entry }: { entry: FileEntry }) {
     );
 }
 
-export default function App() {
+function MainLayout() {
     const [files, setFiles] = useState<FileEntry[]>([]);
+    const [activeTab, setActiveTab] = useState<'files' | 'activity'>('files');
     const [isDragOver, setIsDragOver] = useState(false);
+    const { logs, logSuccess, logWarning } = useActivityLog();
 
     const handleDragOver = (e: React.DragEvent<HTMLElement>) => {
         e.preventDefault();
@@ -86,15 +84,38 @@ export default function App() {
         setIsDragOver(false);
 
         const dropped = Array.from(e.dataTransfer.files);
+        if (dropped.length === 0) {
+            logWarning('Drop event ignored', 'No valid files detected in the dropped payload.');
+            return;
+        }
 
         const newEntries: FileEntry[] = dropped.map((file) => ({
             name: file.name,
-            path: window.electronAPI.getPathForFile(file),
+            path: window.electronAPI ? window.electronAPI.getPathForFile(file) : '',
             size: file.size,
             addedAt: Date.now(),
         }));
 
         setFiles((prev) => [...prev, ...newEntries]);
+
+        const totalBytes = newEntries.reduce((sum, f) => sum + f.size, 0);
+        if (newEntries.length === 1) {
+            const single = newEntries[0];
+            logSuccess(
+                `Ingested "${single.name}"`,
+                `${formatBytes(single.size)}${single.path ? ` • ${single.path}` : ''}`,
+                { size: formatBytes(single.size) }
+            );
+        } else {
+            logSuccess(
+                `Ingested ${newEntries.length} files`,
+                `Total size: ${formatBytes(totalBytes)}`,
+                {
+                    count: newEntries.length,
+                    files: newEntries.slice(0, 5).map((f) => f.name),
+                }
+            );
+        }
     };
 
     const sortedFiles = [...files].sort((a, b) => b.addedAt - a.addedAt);
@@ -102,12 +123,41 @@ export default function App() {
     return (
         <div className="app">
             <aside id="sidebar" className="sidebar">
-                <h2 className="sidebar-title">Files</h2>
-                <ul id="file-list" className="file-list">
-                    {sortedFiles.map((entry, index) => (
-                        <FileItem key={index} entry={entry} />
-                    ))}
-                </ul>
+                <div className="sidebar-tabs">
+                    <button
+                        type="button"
+                        className={`sidebar-tab ${activeTab === 'files' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('files')}
+                    >
+                        Files {files.length > 0 && <span className="tab-badge">{files.length}</span>}
+                    </button>
+                    <button
+                        type="button"
+                        className={`sidebar-tab ${activeTab === 'activity' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('activity')}
+                    >
+                        Activity Log {logs.length > 0 && <span className="tab-badge">{logs.length}</span>}
+                    </button>
+                </div>
+
+                {activeTab === 'files' ? (
+                    <div className="files-view">
+                        {sortedFiles.length === 0 ? (
+                            <div className="sidebar-empty">
+                                <p>No files ingested yet.</p>
+                                <span>Drop files into the dropzone to add them here.</span>
+                            </div>
+                        ) : (
+                            <ul id="file-list" className="file-list">
+                                {sortedFiles.map((entry, index) => (
+                                    <FileItem key={`${entry.path || entry.name}-${index}`} entry={entry} />
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+                ) : (
+                    <ActivityLog />
+                )}
             </aside>
 
             <main
@@ -122,5 +172,13 @@ export default function App() {
                 <p className="dropzone-hint">Any format, any size</p>
             </main>
         </div>
+    );
+}
+
+export default function App() {
+    return (
+        <ActivityLogProvider>
+            <MainLayout />
+        </ActivityLogProvider>
     );
 }
